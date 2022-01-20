@@ -1,26 +1,10 @@
-FROM continuumio/anaconda3:2021.05
+# FROM continuumio/anaconda3
+FROM mambaorg/micromamba
 
-ENV LC_ALL=C.UTF-8
-ENV LANG=C.UTF-8
-
-ENV PATH /usr/local/nvidia/bin/:$PATH
-ENV LD_LIBRARY_PATH /usr/local/nvidia/lib:/usr/local/nvidia/lib64
-
-# Tell nvidia-docker the driver spec that we need as well as to
-# use all available devices, which are mounted at /usr/local/nvidia.
-# The LABEL supports an older version of nvidia-docker, the env
-# variables a newer one.
-ENV NVIDIA_VISIBLE_DEVICES all
-ENV NVIDIA_DRIVER_CAPABILITIES compute,utility
-LABEL com.nvidia.volumes.needed="nvidia_driver"
-
-WORKDIR /
-
-# Make this dir to install JDK
-RUN mkdir -p /usr/share/man/man1
+USER root
 
 # Install base packages.
-RUN apt-get update --fix-missing && apt-get install -y \
+RUN apt update && apt install -y \
     default-jdk \
     bzip2 \
     ca-certificates \
@@ -30,18 +14,31 @@ RUN apt-get update --fix-missing && apt-get install -y \
     wget \
     vim \
     build-essential \
-    jq \
-    python3.7-dev  && \
+    jq && \
+    apt clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Install Python packages.
-RUN pip install --upgrade pip
+# Install Julia:
+WORKDIR /downloads/
+COPY install_julia_linux.sh .
+RUN bash install_julia_linux.sh 1.7.1
+# RUN wget https://julialang-s3.julialang.org/bin/linux/aarch64/1.7/julia-1.7.1-linux-aarch64.tar.gz && \
+#     tar -xvf julia-1.7.1-linux-aarch64.tar.gz && \
+#     mv julia-1.7.1 julia && \
+#     rm julia-1.7.1-linux-aarch64.tar.gz && \
+#     ln -s $PWD/julia/bin/julia /usr/local/bin/julia
 
-# Checkout the latest version as of August 24th, 2021
-WORKDIR /opt/app/srbench/
-COPY . .
+# WORKDIR /opt/app/srbench/
 
-RUN conda update conda -y
-RUN bash configure.sh
-SHELL ["conda", "run", "-n", "srbench", "/bin/bash", "-c"]
-RUN bash install.sh
+# COPY environment.yml ./
+# RUN micromamba env create -f environment.yml
+
+# COPY install.sh ./
+# COPY experiment/ ./experiment/
+
+# RUN source /usr/local/bin/_activate_current_env.sh && \
+#     micromamba activate srbench && \
+#     cd /opt/app/srbench/experiment/methods/src/ && \
+#     ./pysr_install.sh
+
+# CMD ["bash"]

@@ -1,9 +1,9 @@
 # install conda environment
-conda env create -f environment.yml
+micromamba env create -f environment.yml
 
 eval "$(conda shell.bash hook)"
 
-conda init bash
-conda activate srbench
-conda info 
+micromamba init bash
+micromamba activate srbench
+micromamba info 
 

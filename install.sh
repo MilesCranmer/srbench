@@ -1,7 +1,7 @@
 # note: make sure conda environment is installed 
 # before running install. see configure.sh
-conda activate srbench
-conda info
+micromamba activate srbench
+micromamba info
 
 failed=()
 
@@ -14,7 +14,7 @@ echo "///////////////////////////"
 cd experiment/methods/src/
 
 # install all methods
-for install_file in $(ls *.sh) ; do
+for install_file in ( pysr_install.sh ) ; do
     echo "vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv"
     echo "Running $install_file"
     echo "////////////////////////////////////////////////////////////////////////////////"
